@@ -2,11 +2,7 @@
 {
     const room = document.getElementById("room-container");
     const socket = io('http://localhost:4000');
-    const fubar = new Fubar("adventurer", socket);
-
-    const btn = document.getElementById("test");
-    btn.addEventListener("click", () => {socket.emit("work", 3)});
-
+    const fubar = new Fubar("scholar", socket);
     // Grabs the data from the json file and sends it to the question class
     fetch("./questions.json")
     .then(function(u){ return u.json();})

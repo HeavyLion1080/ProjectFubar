@@ -10,10 +10,6 @@ const io = require("socket.io")(httpServer, {
 
 io.on('connection', (player) => {
     console.log('a user has connected ' + player.id );
-    //io.on("item-pickup", (item) => {
-    //    console.log("got an item");
-    //    io.emit("item", item); 
-    //});   
     player.on("item-pickup",(id) => 
     {
         io.fetchSockets()

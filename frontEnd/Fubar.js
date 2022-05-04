@@ -132,7 +132,6 @@ class Fubar
         if(this.name == 'adventurer')
         {
             this.addItem(0,500,0,0,false,this.ids.inventory);
-            this.addItem(0,500,0,0,false,this.ids.inventory);
             this.addItem(10,10,0,0,false,this.ids.boxOnRope);
             this.addItem(20,300,100,50,false,this.ids.shelf);
             this.addItem(60,220,131,102,false,this.ids.piggybank);
@@ -144,6 +143,7 @@ class Fubar
 
         else if(this.name == 'scholar')
         {
+            this.addItem(0,500,0,0,false,this.ids.inventory);
             this.addItem(600,100,50,50,true,this.ids.hammer);
             this.addItem(300,100,100,75,false,this.ids.memPuzzle);
             this.addPuzzleListener(300,100,100,75,this.ids.memPuzzle,0);
@@ -260,35 +260,42 @@ class Fubar
     {
         console.log("test");
         const item = document.getElementById(id);
-        const room = item.parentNode;
-        const i = room.visible.indexOf(item.image);
-        room.visible.splice(i, 1);
-        item.y = 525;
-        item.style.top = '525px';
-
-        switch(this.items)
+        if(item == null)
         {
-            case 0:
-                item.x = 310;
-                break;
-            case 1:
-                item.x = 380;
-                break;
-            case 2:
-                item.x = 450;
-                break;
-            case 3:
-                item.x = 520;
-                break;
+            this.addItem(0,0,50,50,true,id)
+            this.pickup(id);
         }
+        else
+        {
+            const room = item.parentNode;
+            const i = this.visible.indexOf(item.image);
+            this.visible.splice(i, 1);
+            item.y = 525;
+            item.style.top = '525px';
 
-        item.style.left = item.x + 'px';
+            switch(this.items)
+            {
+                case 0:
+                    item.x = 310;
+                    break;
+                case 1:
+                    item.x = 380;
+                    break;
+                case 2:
+                    item.x = 450;
+                    break;
+                case 3:
+                    item.x = 520;
+                    break;
+            }
 
-        this.addItem(item.x,item.y,0,0,false,item.id);
+            item.style.left = item.x + 'px';
 
-        ++this.items;
-        item.inv = true;
+            this.addItem(item.x,item.y,0,0,false,item.id);
 
+            ++this.items;
+            item.inv = true;
+        }
     }
 
     // Check which puzzle was clicked and which item is selected
@@ -338,35 +345,35 @@ class Fubar
         const i = this.visible.findIndex(item => item.image === this.images[this.ids.boxOnRope]);
         this.visible.splice(i, 1);
         // Draw the box on the ground and the matches
-        this.addItem(15,400,0,0,false,this.ids.boxOffRope,room);
-        this.addItem(80,450,50,50,true,this.ids.matches,room);
+        this.addItem(15,400,0,0,false,this.ids.boxOffRope);
+        this.addItem(80,450,50,50,true,this.ids.matches);
     }
     breakBank()
     {
         const i = this.visible.findIndex(item => item.image === this.images[this.ids.piggybank]);
         this.visible.splice(i, 1);
-        this.addItem(100,240,0,0,false,this.ids.symPuzSol1,room);
-        this.addItem(100,270,50,50,true,this.ids.key,room);
+        this.addItem(100,240,0,0,false,this.ids.symPuzSol1);
+        this.addItem(100,270,50,50,true,this.ids.key);
     }
     unlock()
     {
         const i = this.visible.findIndex(item => item.image === this.images[this.ids.closedCabinet]);
         this.visible.splice(i, 1);
-        this.addItem(100,200,200,200,false,this.ids.openedCabinet,this.room2);
-        this.addItem(293,270,40,50,false,this.ids.dotPuzzleSol,this.room2); 
+        this.addItem(100,200,200,200,false,this.ids.openedCabinet);
+        this.addItem(293,270,40,50,false,this.ids.dotPuzzleSol); 
     }
     light()
     {
         const i = this.visible.findIndex(item => item.image === this.images[this.ids.candleOff]);
         this.visible.splice(i,1);
-        this.addItem(553,248,0,0,false,this.ids.candleOn,this.room2);
+        this.addItem(553,248,0,0,false,this.ids.candleOn);
     }
     dotPuzzleSolved()
     {
         const i = this.visible.findIndex(item => item.image === this.images[this.ids.dotPuzzle]);
         this.visible.splice(i, 1);
         document.getElementById(this.ids.dotPuzzle).remove();
-        this.addItem(550,250,0,0,false,this.ids.symPuzSol2,this.room1);
+        this.addItem(550,250,0,0,false,this.ids.symPuzSol2);
     }
 
     numberPuzzleSolved()
@@ -384,8 +391,8 @@ class Fubar
         const i = this.visible.findIndex(item => item.image === this.images[this.ids.memPuzzle]);
         this.visible.splice(i, 1);
         document.getElementById(this.ids.memPuzzle).remove();
-        this.addItem(330,130,50,50,true,this.ids.scissors,this.room2);
-        this.addItem(400,130,50,50,false,this.ids.numPuzSol2,this.room2);
+        this.addItem(330,130,50,50,true,this.ids.scissors);
+        this.addItem(400,130,50,50,false,this.ids.numPuzSol2);
     }
 
     // Keeps track of clicks and clears the selected item
