@@ -1,0 +1,160 @@
+* 
+{
+    box-sizing: border-box;
+}
+
+body
+{
+    background-color: white;
+    display: flex;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+ul
+{
+  position: absolute;
+  top: 50px;
+  left: 20px;
+  font-size: xx-large;
+  list-style-type: none;
+}
+
+.game-container
+{
+    background-image: url("assets/room/Background.jpg");
+    position: relative;
+    display: flex;
+    top: 15px;
+    width: 800px;
+    height: 600px;
+    margin: 0 auto;
+    outline: 1px solid black;
+}
+.game-canvas
+{
+  position: absolute;
+}
+.item
+{
+    position: absolute;
+}
+.puzzleImg
+{
+    position: absolute;
+    z-index: 1;
+}
+
+
+
+/*----------------------------Phase 1 elements----------------------------*/
+.btn-grid{
+  position: absolute;
+  display: grid;
+  width: 700px;
+  grid-template-columns: repeat(1, auto);
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.text
+{
+  position: absolute;
+  top: 5px;
+  left: auto;
+  color: white;
+  font-size: x-large;
+}
+
+.btn {
+  background-color: purple;
+  border: 2px solid hsl(200, 100%, 30%);
+  border-radius: 5px;
+  height: 100px;
+  padding: 5px 10px;
+  color: white;
+  font-size: large;
+}
+
+
+.btn:hover {
+  border-color: red;
+}
+
+/*------------------------Sequence puzzle elements------------------------*/
+.puzzleContainer
+{
+  width: 400px;
+  height: 400px;
+  top: 50px;
+  left: 200px;
+  display: none;
+  position: absolute;
+  background-color: black;
+  z-index: 2;
+}
+
+.puzzle 
+{
+  position: absolute;
+  display: grid;
+  top: 45px;
+  left: 45px;
+  grid-template-rows: repeat(3, 100px);
+  grid-template-columns: repeat(3, 100px);
+  background-color: black;
+  grid-row-gap: 5px;
+  grid-column-gap: 5px;
+
+}
+
+.memPuzzle
+{
+  position: absolute;
+  display: grid;
+  left: 25px;
+  top: 25px;
+  grid-template-rows: repeat(2, 120px);
+  grid-template-columns: repeat(4, 80px);
+  perspective: 800px;
+  grid-row-gap: 10px;
+  grid-column-gap: 10px;
+}
+
+.card 
+{
+  position: relative;
+  transform-style: preserve-3d;
+  transition: all 0s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: rgba(0, 0, 0, .2) 0px 5px 15px;
+}
+
+.face,
+.back 
+{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.face
+{
+  transform: rotateY(-180deg);
+}
+
+.back
+{
+  background-color: white;
+  backface-visibility: hidden;
+}
+
+.toggleCard 
+{
+  transform: rotateY(180deg);
+}
+
+.close
+{
+  position: absolute;
+}
