@@ -59,7 +59,7 @@ class Questions
         const nextTextNodeId = option.nextText;
         this.waiting = true;
 
-        if(nextTextNodeId === this.index)
+        if(nextTextNodeId == this.index)
         {
             button.style.backgroundColor = 'red';
             this.wrongAnswer ++;
