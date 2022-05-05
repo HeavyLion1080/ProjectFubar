@@ -8,26 +8,27 @@ const io = require("socket.io")(httpServer, {
 });
 
 
-io.on('connection', (socket) => {
-    console.log('a user has connected ' + socket.id );
-    //io.on("item-pickup", (item) => {
-    //    console.log("got an item");
-    //    io.emit("item", item); 
-    //});   
+io.on('connection', (player) => {
+    console.log('a user has connected ' + player.id );
+    player.on("item-pickup",(id) => 
+    {
+        io.fetchSockets()
+        .then((sockets) => {
+            sockets.forEach((socket) => {
+                console.log(socket.id)
+                socket.emit("item", id);
+            });
+        });
+        
+    });
+    
 
-    io.on("works", () => {
-        console.log("this working in cons");
-    } );
-
-    io.on("work", (num) => {
-        console.log("this working not in cons");
-    } );
-
-    socket.on('disconnect', () => {
+    player.on('disconnect', () => {
         console.log("mfs left B");
     });
 });
 
-io.listen(3000, () => {
-    console.log('listening on *:3000');
+
+httpServer.listen(4000, () => {
+    console.log('listening on *:4000');
 });

@@ -60,10 +60,10 @@ ul
 .text
 {
   position: absolute;
-  top: 5px;
   left: auto;
   color: white;
   font-size: x-large;
+  z-index: 2;
 }
 
 .btn {

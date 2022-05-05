@@ -1,23 +1,28 @@
 class Fubar
 {
-    constructor(room1,room2,puzzle1,puzzle2, socket)
+    constructor(name,socket)
     {
 
-        
-        socket.emit("works");
+        this.socket = socket;
+        this.name = name;
         // Objects
         // Add the class to the container so it can be accessed from eventlisteners
-        this.room1 = room1;
-        this.room2 = room2;
-        this.dotPuzzle = puzzle1;
-        this.memoryPuzzle = puzzle2;
-        this.canvas1 = document.getElementById("room-1-canvas");
-        this.canvas2 = document.getElementById("room-2-canvas");
-        room1.ctx = this.canvas1.getContext("2d");
-        room2.ctx = this.canvas2.getContext("2d");
-        room1.visible = [];
-        room2.visible = [];
-        
+        this.room = document.getElementById("room-container");
+        this.canvas = document.getElementById("room-canvas");
+        this.ctx = this.canvas.getContext("2d");
+        this.visible = [];
+
+        if(name == 'adventurer')
+        {
+            this.numberPuzzle = new SeqPuzzle(this.room, "numberPuzzle", ["card6", "card8", "card2"]);
+            this.dotPuzzle = new SeqPuzzle(this.room, "dotPuzzle", ["card3", "card8", "card1"]);
+        }
+        else if(name == 'scholar')
+        {
+            this.memoryPuzzle = new MemoryPuzzle(this.room);
+            this.symbolPuzzle - new SeqPuzzle(this.room, "symbolPuzzle", ["card1", "card6", "card8"]);
+        }
+ 
         this.images = [];
         this.loaded = 0;
 
@@ -108,57 +113,50 @@ class Fubar
             };
         });
     }
-    changeRoom(oldRoom, newRoom)
-    {
-        oldRoom.style.display = "none";
-        newRoom.style.display = "flex";
-    }
 
     // Clear the current room and draw all visible images
     draw(room)
     {
-        room.ctx.beginPath();
-        room.ctx.clearRect(0,0,800,600);
-        room.ctx.closePath();
-        room.visible.forEach(image => 
+        this.ctx.beginPath();
+        this.ctx.clearRect(0,0,800,600);
+        this.ctx.closePath();
+        this.visible.forEach(image => 
         {
-            room.ctx.drawImage(image.image,image.x,image.y);
+            this.ctx.drawImage(image.image,image.x,image.y);
         })
     }
 
     createRoom()
     {
         // Draw the initial rooms
-        this.addItem(0,500,0,0,false,this.ids.inventory,this.room1);
-        this.addItem(0,500,0,0,false,this.ids.inventory,this.room2);
-        this.addItem(10,10,0,0,false,this.ids.boxOnRope,this.room1);
-        this.addItem(20,300,100,50,false,this.ids.shelf,this.room1);
-        this.addItem(60,220,131,102,false,this.ids.piggybank,this.room1);
-        this.addPuzzleListener(60,220,131,102,this.ids.piggybank,0,this.room1);
-        this.addItem(500,200,100,100,false,this.ids.dotPuzzle,this.room1);
-        this.addPuzzleListener(500,200,100,100,this.ids.dotPuzzle,0,this.room1);
-        this.addPuzzleListener(170,300,300,50,this.ids.boxOnRope,51,this.room1);
-        this.addItem(750,200,0,0,false,this.ids.rightArrow,this.room1);
-        this.addPuzzleListener(750,200,30,100,this.ids.rightArrow,0,this.room1);
+        if(this.name == 'adventurer')
+        {
+            this.addItem(0,500,0,0,false,this.ids.inventory);
+            this.addItem(10,10,0,0,false,this.ids.boxOnRope);
+            this.addItem(20,300,100,50,false,this.ids.shelf);
+            this.addItem(60,220,131,102,false,this.ids.piggybank);
+            this.addPuzzleListener(60,220,131,102,this.ids.piggybank,0);
+            this.addItem(500,200,100,100,false,this.ids.dotPuzzle);
+            this.addPuzzleListener(500,200,100,100,this.ids.dotPuzzle,0);
+            this.addPuzzleListener(170,300,300,50,this.ids.boxOnRope,51);
+        }
 
-
-        this.addItem(600,100,50,50,true,this.ids.matches,this.room2);
-        this.addItem(300,100,100,75,false,this.ids.memPuzzle,this.room2);
-        this.addPuzzleListener(300,100,100,75,this.ids.memPuzzle,0,this.room2);
-        this.addItem(100,200,200,200,false,this.ids.closedCabinet,this.room2);
-        this.addPuzzleListener(100,200,190,200,this.ids.closedCabinet,0,this.room2);
-        this.addItem(15,200,0,0,false,this.ids.leftArrow,this.room2);
-        this.addPuzzleListener(15,200,30,100,this.ids.leftArrow,0,this.room2);
-
-        this.addItem(500,300,0,0,false,this.ids.shelf,this.room2);
-        this.addItem(550,250,0,0,false,this.ids.candleOff,this.room2);
-        this.addPuzzleListener(550,250,30,65,this.ids.candleOff,0,this.room2);
-        
+        else if(this.name == 'scholar')
+        {
+            this.addItem(0,500,0,0,false,this.ids.inventory);
+            this.addItem(600,100,50,50,true,this.ids.hammer);
+            this.addItem(300,100,100,75,false,this.ids.memPuzzle);
+            this.addPuzzleListener(300,100,100,75,this.ids.memPuzzle,0);
+            this.addItem(100,200,200,200,false,this.ids.closedCabinet);
+            this.addPuzzleListener(100,200,190,200,this.ids.closedCabinet,0);
+            this.addItem(500,300,0,0,false,this.ids.shelf);
+            this.addItem(550,250,0,0,false,this.ids.candleOff);
+            this.addPuzzleListener(550,250,30,65,this.ids.candleOff,0);
+        }
 
         // Event listener on the room-container to keep track of clicks, this event triggers after
         // other events as its further back on the page
-        this.canvas1.addEventListener("click", this.clickScreen.bind(this));
-        this.canvas2.addEventListener("click", this.clickScreen.bind(this));
+        this.canvas.addEventListener("click", this.clickScreen.bind(this));
 
         // Create event listers which trigger when the puzzles are solved
         document.addEventListener("dotPuzzleSolved", this.dotPuzzleSolved.bind(this));
@@ -168,7 +166,7 @@ class Fubar
     }
     
     // Draw a new item on the page, pickup is a T/F value for if the item can be picked up
-    addItem(x,y,w,h,pickUp,id,room)
+    addItem(x,y,w,h,pickUp,id)
     {
         // Draw image
         const image = 
@@ -178,8 +176,8 @@ class Fubar
             y: y
         };
         
-        room.visible.push(image);
-        this.draw(room);
+        this.visible.push(image);
+        this.draw(this.room);
 
         // If the item can be picked, up a blank element is created on the game-container
         // Which has an event listener used to pick the item up
@@ -187,7 +185,7 @@ class Fubar
         {
             const item = document.createElement("item");
             item.setAttribute("class", "item");
-            room.appendChild(item);
+            this.room.appendChild(item);
     
             item.style.left = x + 'px';
             item.style.top = y + 'px';
@@ -211,12 +209,12 @@ class Fubar
 
     // Add an event listener to the game-container for interacting with puzzles
     // r rotates the image, used to make the cut rope interaction match the image
-    addPuzzleListener(x,y,w,h,id,r,room)
+    addPuzzleListener(x,y,w,h,id,r)
     {
         const puzzle = document.createElement("puzzle");
         puzzle.setAttribute("class", "puzzleImg");
         puzzle.setAttribute("id",id);
-        room.appendChild(puzzle);
+        this.room.appendChild(puzzle);
     
         puzzle.style.left = x + 'px';
         puzzle.style.top = y + 'px';
@@ -242,10 +240,10 @@ class Fubar
         else
         {
             this.clickScreen();
-            this.pickup(item); //Replace with a server call
+        //    this.pickup(item.id); //Replace with a server call
 
-            //socket.emit("item-pickup", item);
-            //socket.on("item", this.pickup);
+            this.socket.emit("item-pickup", item.id);
+            this.socket.on("item", (id) => this.pickup(id));
         }
     }
 
@@ -258,49 +256,45 @@ class Fubar
 
     // Removes the image of the item from the canvas and repaints it on the inventory bar
     // Also adds a new event listener to the item so it can be used
-    pickup (item)
+    pickup (id)
     {
-        const room = item.parentNode;
-        const i = room.visible.indexOf(item.image);
-        room.visible.splice(i, 1);
-        item.y = 525;
-        item.style.top = '525px';
-
-        switch(this.items)
+        console.log("test");
+        const item = document.getElementById(id);
+        if(item == null)
         {
-            case 0:
-                item.x = 310;
-                break;
-            case 1:
-                item.x = 380;
-                break;
-            case 2:
-                item.x = 450;
-                break;
-            case 3:
-                item.x = 520;
-                break;
-        }
-
-        item.style.left = item.x + 'px';
-
-        this.addItem(item.x,item.y,0,0,false,item.id,this.room1);
-        this.addItem(item.x,item.y,0,0,false,item.id,this.room2);
-
-        ++this.items;
-        item.inv = true;
-
-        // Clone the item to put it in the other room
-        const itemCopy = item.cloneNode(true);
-        itemCopy.inv = true;
-        itemCopy.addEventListener("click", this.itemInteraction.bind(this));
-        if(room == this.room1)
-        {
-            this.room2.appendChild(itemCopy);
+            this.addItem(0,0,50,50,true,id)
+            this.pickup(id);
         }
         else
         {
-            this.room1.appendChild(itemCopy);
+            const room = item.parentNode;
+            const i = this.visible.indexOf(item.image);
+            this.visible.splice(i, 1);
+            item.y = 525;
+            item.style.top = '525px';
+
+            switch(this.items)
+            {
+                case 0:
+                    item.x = 310;
+                    break;
+                case 1:
+                    item.x = 380;
+                    break;
+                case 2:
+                    item.x = 450;
+                    break;
+                case 3:
+                    item.x = 520;
+                    break;
+            }
+
+            item.style.left = item.x + 'px';
+
+            this.addItem(item.x,item.y,0,0,false,item.id);
+
+            ++this.items;
+            item.inv = true;
         }
     }
 
@@ -309,28 +303,27 @@ class Fubar
     puzzleClicked(evt)
     {
         const puzzle = evt.currentTarget;
-        const room = puzzle.parentNode;
         if(puzzle.id == this.ids.boxOnRope && this.selected == this.ids.scissors)
         {
-            this.cutRope(room);
+            this.cutRope();
             puzzle.removeEventListener("click",this.puzzleClicked);
             puzzle.remove();
         }
         else if(puzzle.id == this.ids.piggybank && this.selected == this.ids.hammer)
         {
-            this.breakBank(room);
+            this.breakBank();
             puzzle.removeEventListener("click",this.puzzleClicked);
             puzzle.remove();
         }
         else if(puzzle.id == this.ids.closedCabinet && this.selected == this.ids.key)
         {
-            this.unlock(room);
+            this.unlock();
             puzzle.removeEventListener("click",this.puzzleClicked);
             puzzle.remove();
         }
         else if(puzzle.id == this.ids.candleOff && this.selected == this.ids.matches)
         {
-            this.light(room);
+            this.light();
             puzzle.removeEventListener("click",this.puzzleClicked);
             puzzle.remove();
         }
@@ -342,53 +335,45 @@ class Fubar
         {
             this.memoryPuzzle.show();
         }
-        else if(puzzle.id == this.ids.rightArrow)
-        {
-            this.changeRoom(this.room1,this.room2);
-        }
-        else if(puzzle.id == this.ids.leftArrow)
-        {
-            this.changeRoom(this.room2,this.room1);
-        }
         this.clickScreen();
         
     }
 
     // Change the background image to the one with the cut rope and add the matches
-    cutRope(room)
+    cutRope()
     {
-        const i = room.visible.findIndex(item => item.image === this.images[this.ids.boxOnRope]);
-        room.visible.splice(i, 1);
+        const i = this.visible.findIndex(item => item.image === this.images[this.ids.boxOnRope]);
+        this.visible.splice(i, 1);
         // Draw the box on the ground and the matches
-        this.addItem(15,400,0,0,false,this.ids.boxOffRope,room);
-        this.addItem(80,450,50,50,true,this.ids.matches,room);
+        this.addItem(15,400,0,0,false,this.ids.boxOffRope);
+        this.addItem(80,450,50,50,true,this.ids.matches);
     }
-    breakBank(room)
+    breakBank()
     {
-        const i = room.visible.findIndex(item => item.image === this.images[this.ids.piggybank]);
-        room.visible.splice(i, 1);
-        this.addItem(100,240,0,0,false,this.ids.symPuzSol1,room);
-        this.addItem(100,270,50,50,true,this.ids.key,room);
+        const i = this.visible.findIndex(item => item.image === this.images[this.ids.piggybank]);
+        this.visible.splice(i, 1);
+        this.addItem(100,240,0,0,false,this.ids.symPuzSol1);
+        this.addItem(100,270,50,50,true,this.ids.key);
     }
-    unlock(room)
+    unlock()
     {
-        const i = room.visible.findIndex(item => item.image === this.images[this.ids.closedCabinet]);
-        room.visible.splice(i, 1);
-        this.addItem(100,200,200,200,false,this.ids.openedCabinet,this.room2);
-        this.addItem(293,270,40,50,false,this.ids.dotPuzzleSol,this.room2); 
+        const i = this.visible.findIndex(item => item.image === this.images[this.ids.closedCabinet]);
+        this.visible.splice(i, 1);
+        this.addItem(100,200,200,200,false,this.ids.openedCabinet);
+        this.addItem(293,270,40,50,false,this.ids.dotPuzzleSol); 
     }
-    light(room)
+    light()
     {
-        const i = room.visible.findIndex(item => item.image === this.images[this.ids.candleOff]);
-        room.visible.splice(i,1);
-        this.addItem(553,248,0,0,false,this.ids.candleOn,this.room2);
+        const i = this.visible.findIndex(item => item.image === this.images[this.ids.candleOff]);
+        this.visible.splice(i,1);
+        this.addItem(553,248,0,0,false,this.ids.candleOn);
     }
     dotPuzzleSolved()
     {
-        const i = this.room1.visible.findIndex(item => item.image === this.images[this.ids.dotPuzzle]);
-        this.room1.visible.splice(i, 1);
+        const i = this.visible.findIndex(item => item.image === this.images[this.ids.dotPuzzle]);
+        this.visible.splice(i, 1);
         document.getElementById(this.ids.dotPuzzle).remove();
-        this.addItem(550,250,0,0,false,this.ids.symPuzSol2,this.room1);
+        this.addItem(550,250,0,0,false,this.ids.symPuzSol2);
     }
 
     numberPuzzleSolved()
@@ -403,11 +388,11 @@ class Fubar
 
     memoryPuzzleSolved()
     {
-        const i = this.room2.visible.findIndex(item => item.image === this.images[this.ids.memPuzzle]);
-        this.room2.visible.splice(i, 1);
+        const i = this.visible.findIndex(item => item.image === this.images[this.ids.memPuzzle]);
+        this.visible.splice(i, 1);
         document.getElementById(this.ids.memPuzzle).remove();
-        this.addItem(330,130,50,50,true,this.ids.scissors,this.room2);
-        this.addItem(400,130,50,50,false,this.ids.numPuzSol2,this.room2);
+        this.addItem(330,130,50,50,true,this.ids.scissors);
+        this.addItem(400,130,50,50,false,this.ids.numPuzSol2);
     }
 
     // Keeps track of clicks and clears the selected item
