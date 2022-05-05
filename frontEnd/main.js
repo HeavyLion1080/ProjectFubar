@@ -12,7 +12,6 @@
 
     var questions;
     var timerCountdown;
-    fubar.init();
     // Grabs the data from the json file and sends it to the question class
     fetch("./questions.json")
     .then(function(u){ return u.json();})

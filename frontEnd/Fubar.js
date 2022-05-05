@@ -226,7 +226,6 @@ class Fubar
         puzzle.style.width = w + 'px';
         puzzle.style.height = h + 'px';
         puzzle.style.transform = 'rotate('+ r + 'deg)';
-        puzzle.style.background = 'green';
         puzzle.style.opacity = '25%';
         puzzle.id = id;
 
