@@ -1,7 +1,7 @@
 (function () 
 {
     const room = document.getElementById("room-container");
-    const name = 'adventurer';
+    const name = 'scholar';
     const socket = io('http://localhost:4000');
     const fubar = new Fubar(name, socket);
 
@@ -12,6 +12,7 @@
 
     var questions;
     var timerCountdown;
+    fubar.init();
     // Grabs the data from the json file and sends it to the question class
     fetch("./questions.json")
     .then(function(u){ return u.json();})
