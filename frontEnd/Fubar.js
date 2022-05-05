@@ -65,6 +65,9 @@ class Fubar
     // Load all the images then call base room constructor
     init()
     {
+        
+        this.socket.on("item", (id) => this.pickup(id));
+        
         const srcs = [
             "assets/room/hammer.png", 
             "assets/room/key.png", 
@@ -243,7 +246,6 @@ class Fubar
         //    this.pickup(item.id); //Replace with a server call
 
             this.socket.emit("item-pickup", item.id);
-            this.socket.on("item", (id) => this.pickup(id));
         }
     }
 
