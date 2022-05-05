@@ -10,6 +10,7 @@ class Questions
         this.container.style.top = '0px';
         this.textElement = document.createElement("text");
         this.textElement.setAttribute("class","text");
+        this.textElement.style.top = '40px';
         this.container.appendChild(this.textElement);
         this.optionButtonsElement = document.createElement("option-buttons");
         this.optionButtonsElement.setAttribute("class","btn-grid");
@@ -64,10 +65,14 @@ class Questions
             button.style.backgroundColor = 'red';
             this.wrongAnswer ++;
             console.log(this.wrongAnswer);
+            let event = new Event("subtractTime");
+            document.dispatchEvent(event);
         }
         else
         {
             button.style.backgroundColor = 'green';
+            let event = new Event("addTime");
+            document.dispatchEvent(event);
         }
         setTimeout(() => { 
             button.style.backgroundColor = 'purple'; 
