@@ -20,9 +20,8 @@ class Fubar
         else if(name == 'scholar')
         {
             this.memoryPuzzle = new MemoryPuzzle(this.room);
-            this.symbolPuzzle - new SeqPuzzle(this.room, "symbolPuzzle", ["card1", "card6", "card8"]);
+            this.symbolPuzzle = new SeqPuzzle(this.room, "symbolPuzzle", ["card1", "card6", "card8"]);
         }
- 
         this.images = [];
         this.loaded = 0;
 
@@ -65,7 +64,7 @@ class Fubar
     // Load all the images then call base room constructor
     init()
     {
-        
+    
         this.socket.on("item", (id) => this.pickup(id));
         
         const srcs = [
@@ -139,22 +138,27 @@ class Fubar
             this.addItem(20,300,100,50,false,this.ids.shelf);
             this.addItem(60,220,131,102,false,this.ids.piggybank);
             this.addPuzzleListener(60,220,131,102,this.ids.piggybank,0);
-            this.addItem(500,200,100,100,false,this.ids.dotPuzzle);
-            this.addPuzzleListener(500,200,100,100,this.ids.dotPuzzle,0);
+            this.addItem(375,200,100,100,false,this.ids.dotPuzzle);
+            this.addPuzzleListener(375,200,100,100,this.ids.dotPuzzle,0);
             this.addPuzzleListener(170,300,300,50,this.ids.boxOnRope,51);
+            this.addItem(600,300,0,0,false,this.ids.numPuzzle);
+            this.addPuzzleListener(600,300,100,100,this.ids.numPuzzle);
         }
 
         else if(this.name == 'scholar')
         {
             this.addItem(0,500,0,0,false,this.ids.inventory);
-            this.addItem(600,100,50,50,true,this.ids.hammer);
-            this.addItem(300,100,100,75,false,this.ids.memPuzzle);
-            this.addPuzzleListener(300,100,100,75,this.ids.memPuzzle,0);
-            this.addItem(100,200,200,200,false,this.ids.closedCabinet);
-            this.addPuzzleListener(100,200,190,200,this.ids.closedCabinet,0);
-            this.addItem(500,300,0,0,false,this.ids.shelf);
-            this.addItem(550,250,0,0,false,this.ids.candleOff);
-            this.addPuzzleListener(550,250,30,65,this.ids.candleOff,0);
+            this.addItem(550,200,0,0,false,this.ids.shelf);
+            this.addItem(665,165,50,50,true,this.ids.hammer);
+            this.addItem(375,250,100,75,false,this.ids.memPuzzle);
+            this.addPuzzleListener(375,250,100,75,this.ids.memPuzzle,0);
+            this.addItem(50,200,200,200,false,this.ids.closedCabinet);
+            this.addPuzzleListener(50,200,190,200,this.ids.closedCabinet,0);
+
+            this.addItem(610,150,0,0,false,this.ids.candleOff);
+            this.addPuzzleListener(610,150,30,65,this.ids.candleOff,0);
+            this.addItem(600,300,100,100,false,this.ids.symbolPuzzle);
+            this.addPuzzleListener(600,300,100,100,this.ids.symbolPuzzle);
         }
 
         // Event listener on the room-container to keep track of clicks, this event triggers after
@@ -224,7 +228,6 @@ class Fubar
         puzzle.style.width = w + 'px';
         puzzle.style.height = h + 'px';
         puzzle.style.transform = 'rotate('+ r + 'deg)';
-        puzzle.style.background = 'green';
         puzzle.style.opacity = '25%';
         puzzle.id = id;
 
@@ -337,6 +340,14 @@ class Fubar
         {
             this.memoryPuzzle.show();
         }
+        else if(puzzle.id == this.ids.numPuzzle && this.selected == -1)
+        {
+            this.numberPuzzle.show();
+        }
+        else if(puzzle.id == this.ids.symbolPuzzle && this.selected == -1)
+        {
+            this.symbolPuzzle.show();
+        }
         this.clickScreen();
         
     }
@@ -348,34 +359,37 @@ class Fubar
         this.visible.splice(i, 1);
         // Draw the box on the ground and the matches
         this.addItem(15,400,0,0,false,this.ids.boxOffRope);
+        this.addItem(28,95,0,0,false,this.ids.symPuzSol1);
         this.addItem(80,450,50,50,true,this.ids.matches);
     }
     breakBank()
     {
         const i = this.visible.findIndex(item => item.image === this.images[this.ids.piggybank]);
         this.visible.splice(i, 1);
-        this.addItem(100,240,0,0,false,this.ids.symPuzSol1);
+        this.addItem(100,240,0,0,false,this.ids.symPuzSol2);
         this.addItem(100,270,50,50,true,this.ids.key);
     }
     unlock()
     {
         const i = this.visible.findIndex(item => item.image === this.images[this.ids.closedCabinet]);
         this.visible.splice(i, 1);
-        this.addItem(100,200,200,200,false,this.ids.openedCabinet);
-        this.addItem(293,270,40,50,false,this.ids.dotPuzzleSol); 
+        this.addItem(48,195,200,200,false,this.ids.openedCabinet);
+        this.addItem(162,270,0,0,false,this.ids.numPuzSol1);
+        this.addItem(240,270,40,50,false,this.ids.dotPuzzleSol); 
     }
     light()
     {
         const i = this.visible.findIndex(item => item.image === this.images[this.ids.candleOff]);
         this.visible.splice(i,1);
-        this.addItem(553,248,0,0,false,this.ids.candleOn);
+        this.addItem(603,148,0,0,false,this.ids.candleOn);
+        this.addItem(590,90,0,0,false,this.ids.numPuzSol3);
     }
     dotPuzzleSolved()
     {
         const i = this.visible.findIndex(item => item.image === this.images[this.ids.dotPuzzle]);
         this.visible.splice(i, 1);
         document.getElementById(this.ids.dotPuzzle).remove();
-        this.addItem(550,250,0,0,false,this.ids.symPuzSol2);
+        this.addItem(400,220,0,0,false,this.ids.symPuzSol3);
     }
 
     numberPuzzleSolved()

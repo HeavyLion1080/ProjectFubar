@@ -191,7 +191,6 @@ gameScreen.style.display = "block";
   //.then(function(data){createQuestions(data);})
 
 
-
   function createQuestions(data)
   {
     timerCountdown = data[0].time;
