@@ -5,6 +5,9 @@
 
   var name;
 
+  var has_focus = true;
+  window.onfocus = () => has_focus = true;
+  window.onblur = () => has_focus = false;
   // Create timer element in the top right of the game
   const timerDisplay = document.getElementById('timer');
   timerDisplay.style.top = '10px';
@@ -16,7 +19,6 @@
 
   //start sceen stoof  
   socket.on('init', handleInit);                      //sets player number 
-  socket.on('gameOver', handleGameOver);              //sends win or lose message
   socket.on('gameCode', handleGameCode);              //Displays gamecode
   socket.on('unknownCode', handleUnknownCode);        //sends error message
   socket.on('tooManyPlayers', handleTooManyPlayers);  //send message if a player tries to enter a full room
@@ -25,6 +27,7 @@
   socket.on('startFubar',startFubar);
   socket.on('loseGame',showLoseScreen);
   socket.on('winGame',showWinScreen);
+  socket.on('playerLeft',playerLeft);
 
   socket.on('roleTaken', disableButton);
 
@@ -99,21 +102,6 @@
     }
   }
 
-  function handleGameOver(data) {
-    if (!gameActive) {
-      return;
-    }
-    data = JSON.parse(data);
-  
-    gameActive = false; 
-  
-    if (data.winner === playerNumber) {
-      alert('You Win!');
-    } else {
-      alert('You Lose :(');
-    }
-  }
-  
   function handleGameCode(gameCode) {
 
     console.log("game COde is " + gameCode);
@@ -121,12 +109,10 @@
   }
   
   function handleUnknownCode() {
-    reset();
     alert('Unknown Game Code')
   }
   
   function handleTooManyPlayers() {
-    reset();
     alert('This game is already in progress');
   }
 
@@ -143,13 +129,6 @@
   function showRoleSelectionScreen(){
     initialScreen.remove();
     roleSelectScreen.style.display = "flex";
-  }
-
-  function reset() {
-    playerNumber = null;
-    gameCodeInput.value = '';
-    initialScreen.style.display = "block";
-    roleSelectScreen.style.display = "none";
   }
 
   function startGame() {
@@ -177,12 +156,46 @@
 
   function showWinScreen(metrics)
   {
-    
+    clearInterval(room.timer);
+    removeAllCHildNodes(room);
+    const resultScreen = new Result(room);
+    if(playerNumber == 1)
+      resultScreen.adminWin(metrics);
+    else
+      resultScreen.playerWin(metrics);
   }
   function showLoseScreen(metrics)
   {
-
+    console.log('L');
+    clearInterval(room.timer);
+    removeAllCHildNodes(room);
+    const resultScreen = new Result(room);
+    if(playerNumber == 1)
+      resultScreen.adminLoss(metrics);
+    else
+      resultScreen.playerLoss(metrics);
   }
+  function removeAllCHildNodes(parent)
+  {
+    while(parent.children[1])
+    {
+      parent.removeChild(parent.children[1]);
+    }
+  }
+  function playerLeft()
+  {
+    if(has_focus)
+    {
+      if(!alert("test")) {
+        location.reload();
+      }
+    }
+    else
+    {
+      setTimeout(() => playerLeft(),250);
+    }
+  }
+    
 /*
 ///////////////////////////////////////////////////////////////////
 
@@ -225,15 +238,13 @@ gameScreen.style.display = "block";
   document.addEventListener("start", () =>
   {
     timerDisplay.innerText = "Time Remaining: " + timerCountdown;
-    const timer = setInterval(() => 
+    room.timer = setInterval(() => 
     {
       timerCountdown -= 1;
       timerDisplay.innerText = "Time Remaining: " + timerCountdown;
       if(timerCountdown <= 0)
       {
-        let event = new Event("lose");
-        document.dispatchEvent(event);
-        clearInterval(timer);
+        clearInterval(room.timer);
       }
     },1000);
     document.addEventListener("subtractTime", () => timerCountdown = timerCountdown - 20);

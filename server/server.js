@@ -76,7 +76,7 @@ io.on('connection', (player) => {
             room.questions = 0;
             room.finalPuzzles = 0;
             room.metrics = {};
-            room.metrics['scholorIncorrect'] = 0;
+            room.metrics['scholarIncorrect'] = 0;
             room.metrics['adventurerIncorrect'] = 0;
             room.metrics['scholarClicks'] = 0;
             room.metrics['adventurerClicks'] = 0 ;
@@ -132,21 +132,26 @@ io.on('connection', (player) => {
         function setTimer(timerCountdown)
         {
             room.timerCountdown = timerCountdown;
+            startTimer();
         }
         function startTimer()
         {
-            room.timer = setInterval(() => {
-                room.timerCountdown -= 1;
-                if(timerCountdown <= 0)
-                {
-                    io.to(roomName).emit('loseGame');
-                    clearInterval(room.timer);
-                }
-                if(timerCountdown % 5)
-                {
-                    io.to(roomName).emit('syncTimer',room.timerCountdown);
-                }
-            },1000);
+            if(!room.timer)
+            {
+                room.timer = setInterval(() => {
+                    room.timerCountdown -= 1;
+                    if(room.timerCountdown <= 0)
+                    {
+                        console.log("time Ran out B");
+                        io.to(roomName).emit('loseGame',room.metrics);
+                        clearInterval(room.timer);
+                    }
+                    if(room.timerCountdown % 5)
+                    {
+                        io.to(roomName).emit('syncTimer',room.timerCountdown);
+                    }
+                },1000);
+            }
         }
 
         player.on('incorrectQuestion',incorrectQuestion);
@@ -215,6 +220,10 @@ io.on('connection', (player) => {
                 io.to(roomName).emit('winGame',room.metrics);
             }
         }
+        player.on('disconnect', () => {
+            console.log("mfs left B");
+            io.to(roomName).emit('playerLeft');
+        });
 
     }
 
@@ -242,10 +251,6 @@ io.on('connection', (player) => {
         
     });
     
-
-    player.on('disconnect', () => {
-        console.log("mfs left B");
-    });
 });
 
 
