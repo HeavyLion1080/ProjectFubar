@@ -1,11 +1,14 @@
 class SeqPuzzle
 {
-  constructor(element,type,solution)
+  constructor(element,type,solution,socket)
   {
     // Create the puzzle container and append it to the game-container
     this.container = document.createElement("container");
     this.container.setAttribute("class","puzzleContainer");
     element.appendChild(this.container);
+    this.container.addEventListener('click',()=>{
+      socket.emit('click');
+    })
     // Create the puzzle and append it to the puzzle container
     this.puzzle = document.createElement("puzzle");
     this.puzzle.setAttribute("class","puzzle")

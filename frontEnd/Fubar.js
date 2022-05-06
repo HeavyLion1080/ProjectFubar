@@ -14,13 +14,13 @@ class Fubar
 
         if(name == 'adventurer')
         {
-            this.numberPuzzle = new SeqPuzzle(this.room, "numberPuzzle", ["card6", "card8", "card2"]);
-            this.dotPuzzle = new SeqPuzzle(this.room, "dotPuzzle", ["card3", "card8", "card1"]);
+            this.numberPuzzle = new SeqPuzzle(this.room, "numberPuzzle", ["card6", "card8", "card2"],this.socket);
+            this.dotPuzzle = new SeqPuzzle(this.room, "dotPuzzle", ["card3", "card8", "card1"],this.socket);
         }
         else if(name == 'scholar')
         {
-            this.memoryPuzzle = new MemoryPuzzle(this.room);
-            this.symbolPuzzle = new SeqPuzzle(this.room, "symbolPuzzle", ["card1", "card6", "card8"]);
+            this.memoryPuzzle = new MemoryPuzzle(this.room,this.socket);
+            this.symbolPuzzle = new SeqPuzzle(this.room, "symbolPuzzle", ["card1", "card6", "card8"],this.socket);
         }
         this.images = [];
         this.loaded = 0;
@@ -394,12 +394,18 @@ class Fubar
 
     numberPuzzleSolved()
     {
-
+        const i = this.visible.findIndex(item => item.image === this.images[this.ids.numPuzzle]);
+        this.visible.splice(i, 1);
+        document.getElementById(this.ids.numPuzzle).remove();
+        this.socket.emit('finalPuzzleSolved');
     }
 
     symbolPuzzleSolved()
     {
-
+        const i = this.visible.findIndex(item => item.image === this.images[this.ids.symbolPuzzle]);
+        this.visible.splice(i, 1);
+        document.getElementById(this.ids.symbolPuzzle).remove();
+        this.socket.emit('finalPuzzleSolved');
     }
 
     memoryPuzzleSolved()
@@ -414,7 +420,7 @@ class Fubar
     // Keeps track of clicks and clears the selected item
     clickScreen ()
     {
-        console.log(++this.clicks);
+        this.socket.emit('click');
         var items = [].slice.call(document.getElementsByClassName("item"));
         items.forEach(item => { item.style.background = 'transparent'});
         this.selected = -1;

@@ -74,6 +74,14 @@ io.on('connection', (player) => {
             room.scholarPlayer = 0;
             room.adventurerPlayer = 0;
             room.questions = 0;
+            room.finalPuzzles = 0;
+            room.metrics = {};
+            room.metrics['scholorIncorrect'] = 0;
+            room.metrics['adventurerIncorrect'] = 0;
+            room.metrics['scholarClicks'] = 0;
+            room.metrics['adventurerClicks'] = 0 ;
+            room.metrics['timeRemaining'] = 0;
+
             
         } else if (numPlayers === 2) {
             console.log("number of player is " + numPlayers)
@@ -127,12 +135,12 @@ io.on('connection', (player) => {
         }
         function startTimer()
         {
-            const timer = setInterval(() => {
+            room.timer = setInterval(() => {
                 room.timerCountdown -= 1;
                 if(timerCountdown <= 0)
                 {
                     io.to(roomName).emit('loseGame');
-                    clearInterval(timer);
+                    clearInterval(room.timer);
                 }
                 if(timerCountdown % 5)
                 {
@@ -148,7 +156,14 @@ io.on('connection', (player) => {
         {
             room.timerCountdown -= 20;
             io.to(roomName).emit('syncTimer',room.timerCountdown);
-            player.incorrectQuestions++;
+            if(player.number == room.scholarPlayer)
+            {
+                room.metrics['scholorIncorrect']++;
+            }
+            else if(player.number == room.adventurerPlayer)
+            {
+                room.metrics['adventurerIncorrect']++;
+            }
         }
         function correctQuestion(nextTextNodeId)
         {
@@ -165,8 +180,41 @@ io.on('connection', (player) => {
                     io.to(roomName).emit('startFubar');
                 }
             }
-        }
+        }  
 
+        player.on('click',click);
+        function click()
+        {
+            if(player.number == room.scholarPlayer)
+            {
+                room.metrics['scholarClicks']++;
+            }
+            else if(player.number == room.adventurerPlayer)
+            {
+                room.metrics['adventurerClicks']++;
+            }
+        }
+        
+        player.on('finalPuzzleSolved',finalPuzzleSolved);
+        function finalPuzzleSolved()
+        {
+            room.finalPuzzles++;
+            if(room.finalPuzzles == 2)
+            {
+                if(player.number == room.scholarPlayer)
+                {
+                    room.metrics['scholarClicks']++;
+                }
+                else if(player.number == room.adventurerPlayer)
+                {
+                    room.metrics['adventurerClicks']++;
+                }  
+                clearInterval(room.timer);
+                room.metrics['timeRemaining'] = room.timerCountdown; 
+
+                io.to(roomName).emit('winGame',room.metrics);
+            }
+        }
 
     }
 

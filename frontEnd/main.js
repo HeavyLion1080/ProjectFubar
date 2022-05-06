@@ -23,6 +23,8 @@
   socket.on('startGame',startGame);
   socket.on('syncTimer',syncTimer);
   socket.on('startFubar',startFubar);
+  socket.on('loseGame',showLoseScreen);
+  socket.on('winGame',showWinScreen);
 
   socket.on('roleTaken', disableButton);
 
@@ -152,9 +154,9 @@
 
   function startGame() {
     roleSelectScreen.remove();
-  fetch("./questions.json")
-  .then(function(u){ return u.json();})
-  .then(function(data){createQuestions(data);})
+    fetch("./questions.json")
+    .then(function(u){ return u.json();})
+    .then(function(data){createQuestions(data);})
   }
 
   function syncTimer(time)
@@ -171,6 +173,15 @@
       const fubar = new Fubar(name, socket);
       fubar.init();
     }
+  }
+
+  function showWinScreen(metrics)
+  {
+    
+  }
+  function showLoseScreen(metrics)
+  {
+
   }
 /*
 ///////////////////////////////////////////////////////////////////
@@ -198,12 +209,13 @@ gameScreen.style.display = "block";
     if(name == 'adventurer')
     {
       questions = new Questions(room, data[1].questions, socket);
+      questions.startGame();
     }
     else if(name == 'scholar')
     {
       questions = new Questions(room, data[2].questions, socket);
+      questions.startGame();
     }
-    questions.startGame();
     let start = new Event("start");
     socket.emit('startTimer',timerCountdown);
     document.dispatchEvent(start);
