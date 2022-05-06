@@ -2,7 +2,6 @@
 {
   const room = document.getElementById("room-container");
   const socket = io('http://localhost:4000');
-  const fubar = new Fubar(name, socket);
 
   var name;
 
@@ -11,17 +10,22 @@
   timerDisplay.style.top = '10px';
   timerDisplay.style.right = '10px';
 
+  const codeDisplay = document.getElementById('code');
+  codeDisplay.style.top = '10px';
+  codeDisplay.style.left = '10px';
+
   //start sceen stoof  
   socket.on('init', handleInit);                      //sets player number 
-  socket.on('gameState', handleGameState);            //game loop
   socket.on('gameOver', handleGameOver);              //sends win or lose message
   socket.on('gameCode', handleGameCode);              //Displays gamecode
   socket.on('unknownCode', handleUnknownCode);        //sends error message
   socket.on('tooManyPlayers', handleTooManyPlayers);  //send message if a player tries to enter a full room
+  socket.on('startGame',startGame);
+  socket.on('syncTimer',syncTimer);
+  socket.on('startFubar',startFubar);
 
   socket.on('roleTaken', disableButton);
 
-  const gameScreen = document.getElementById('gameScreen');
   const initialScreen = document.getElementById('initialScreen');
   const newGameBtn = document.getElementById('newGameButton');
   const joinGameBtn = document.getElementById('joinGameButton');
@@ -39,12 +43,18 @@
   function makeScholar(){
     console.log("mfs wanna be scholars n shit");
 
+    adventurerSelect.removeEventListener('click', makeAdventurer);
+    adventurerSelect.style.background = "grey";
+
     socket.emit('roleSelect', "scholar");
     name = "scholar";
   }
 
   function makeAdventurer(){
     console.log("mfs wanna die outside");
+
+    scholarSelect.removeEventListener('click', makeScholar);
+    scholarSelect.style.background = "grey";
 
     socket.emit('roleSelect', "adventurer");
     name = "adventurer";
@@ -86,14 +96,7 @@
       showRoleSelectionScreen();
     }
   }
-  function handleGameState(gameState) {
-    if (!gameActive) {
-      return;
-    }
-    gameState = JSON.parse(gameState);
-    requestAnimationFrame(() => paintGame(gameState));
-  }
-  
+
   function handleGameOver(data) {
     if (!gameActive) {
       return;
@@ -112,7 +115,7 @@
   function handleGameCode(gameCode) {
 
     console.log("game COde is " + gameCode);
-    //gameCodeDisplay.innerText = gameCode;
+    codeDisplay.innerText = "Game Code: " + gameCode;
   }
   
   function handleUnknownCode() {
@@ -127,11 +130,17 @@
 
   function showAdminScreen () {
     console.log("Admin Screen");
+
+    const initialScreen = document.getElementById('initialScreen');
+    const roleScreen = document.getElementById('roleSelectScreen');
+    initialScreen.remove();
+    initialScreen.remove();
+    
   }
 
   function showRoleSelectionScreen(){
-    initialScreen.style.display = "none";
-    roleSelectScreen.style.display = "block";
+    initialScreen.remove();
+    roleSelectScreen.style.display = "flex";
   }
 
   function reset() {
@@ -139,6 +148,29 @@
     gameCodeInput.value = '';
     initialScreen.style.display = "block";
     roleSelectScreen.style.display = "none";
+  }
+
+  function startGame() {
+    roleSelectScreen.remove();
+  fetch("./questions.json")
+  .then(function(u){ return u.json();})
+  .then(function(data){createQuestions(data);})
+  }
+
+  function syncTimer(time)
+  {
+    timerCountdown = time;
+  }
+
+  function startFubar()
+  {
+    if(playerNumber != 1)
+    {
+      const questionContainer = document.getElementById('question-container');
+      questionContainer.remove();
+      const fubar = new Fubar(name, socket);
+      fubar.init();
+    }
   }
 /*
 ///////////////////////////////////////////////////////////////////
@@ -166,33 +198,33 @@ gameScreen.style.display = "block";
     console.log(timerCountdown);
     if(name == 'adventurer')
     {
-      questions = new Questions(room, fubar, data[1].questions);
+      questions = new Questions(room, data[1].questions, socket);
     }
     else if(name == 'scholar')
     {
-      questions = new Questions(room, fubar, data[2].questions);
+      questions = new Questions(room, data[2].questions, socket);
     }
     questions.startGame();
     let start = new Event("start");
+    socket.emit('startTimer',timerCountdown);
     document.dispatchEvent(start);
   };
 
   // Start timer after questions are started
   document.addEventListener("start", () =>
   {
-    const startTime = Date.now();
+    timerDisplay.innerText = "Time Remaining: " + timerCountdown;
     const timer = setInterval(() => 
     {
-      var delta = Date.now() - startTime;
-      var timeRemaining = (timerCountdown - Math.floor(delta / 1000));
-      timerDisplay.innerText = "Time Remaining: " + timeRemaining;
-      if(timeRemaining <= 0)
+      timerCountdown -= 1;
+      timerDisplay.innerText = "Time Remaining: " + timerCountdown;
+      if(timerCountdown <= 0)
       {
         let event = new Event("lose");
         document.dispatchEvent(event);
         clearInterval(timer);
       }
-    },100);
+    },1000);
     document.addEventListener("subtractTime", () => timerCountdown = timerCountdown - 20);
     document.addEventListener("addTime", () => timerCountdown = timerCountdown + 20);
   });

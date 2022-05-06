@@ -1,8 +1,9 @@
 class Questions
 {
-    constructor(container,fubar,data)
+    constructor(container,data,socket)
     {
-        this.container = document.createElement("question-container");
+        this.container = document.createElement("div");
+        this.container.setAttribute('id','question-container');
         this.container.setAttribute("class","game-container");
         container.appendChild(this.container);
         this.container.style.justifyContent = "center";
@@ -16,11 +17,13 @@ class Questions
         this.optionButtonsElement.setAttribute("class","btn-grid");
         this.container.appendChild(this.optionButtonsElement);
 
-        this.fubar = fubar;
         this.index = 0;
         this.waiting = false;
         this.wrongAnswer = 0;
         this.textNodes = data;
+
+        this.socket = socket;
+        this.socket.on('nextQuestion',this.nextQuestion.bind(this));
     }
 
     startGame() 
@@ -65,27 +68,28 @@ class Questions
             button.style.backgroundColor = 'red';
             this.wrongAnswer ++;
             console.log(this.wrongAnswer);
-            let event = new Event("subtractTime");
-            document.dispatchEvent(event);
+            this.socket.emit('incorrectQuestion');
+            setTimeout(() => { 
+                button.style.backgroundColor = 'purple'; 
+                this.waiting = false;
+                this.showTextNode(nextTextNodeId)
+            },500);
         }
         else
         {
             button.style.backgroundColor = 'green';
-            let event = new Event("addTime");
-            document.dispatchEvent(event);
+            this.socket.emit('correctQuestion',nextTextNodeId);
         }
-        setTimeout(() => { 
+    }
+    nextQuestion(nextTextNodeId)
+    {
+        const HTMLbuttons = document.getElementsByClassName('btn');
+        const buttons = Array.prototype.slice.call(HTMLbuttons);
+        console.log(this);
+        buttons.forEach(button => {
             button.style.backgroundColor = 'purple'; 
-            this.waiting = false;
-            if(nextTextNodeId == 5)
-            {
-                this.container.remove();
-                this.fubar.init();
-            }   
-            else
-            {
-                this.showTextNode(nextTextNodeId)
-            }
-        },500);
+        })
+        this.waiting = false;
+        this.showTextNode(nextTextNodeId)
     }
 }

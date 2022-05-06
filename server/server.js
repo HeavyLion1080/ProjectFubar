@@ -19,9 +19,11 @@ io.on('connection', (player) => {
     player.on('newGame', handleNewGame);
     player.on('joinGame', handleJoinGame);
 
+    player.incorrectQuestions = 0;
+    player.clicks = 0;
 
     function handleNewGame() {
-        let roomName = makeid(5);
+        let roomName = makeid(4);
         console.log(roomName);
         playerRooms[player.id] = roomName;
         player.emit('gameCode', roomName);
@@ -45,6 +47,7 @@ io.on('connection', (player) => {
     
     function handleJoinGame(roomName) {
         const room = io.sockets.adapter.rooms.get(roomName);
+        console.log(io.sockets.adapter.rooms)
     
         
         console.log("server sees room " + room + "and the name " + roomName)
@@ -68,7 +71,9 @@ io.on('connection', (player) => {
             player.number = 2;
             player.emit('init', 2);
         
-            //startGameInterval(roomName);
+            room.scholarPlayer = 0;
+            room.adventurerPlayer = 0;
+            room.questions = 0;
             
         } else if (numPlayers === 2) {
             console.log("number of player is " + numPlayers)
@@ -77,19 +82,23 @@ io.on('connection', (player) => {
             player.join(roomName);
             player.number = 3;
             player.emit('init', 3);
-        
-            //startGameInterval(roomName);
-            
+            if(room.scholarPlayer)
+            {
+                player.emit('roleTaken', 'scholar');
+            }
+            else if(room.adventurerPlayer)
+            {
+                player.emit('roleTaken', 'adventurer');
+            }
+                    
         } else if (numPlayers > 2) {
             console.log("number of player is " + numPlayers)
             player.emit('tooManyPlayers');
             return;
         } 
+        player.emit('gameCode', roomName);
 
-        room.scholarPlayer;
-        room.adventurerPlayer;
     
-
         player.on('roleSelect', checkRole);
     
 
@@ -104,18 +113,66 @@ io.on('connection', (player) => {
 
             console.log("the role be " + theRole);
 
-            player.emit('roleTaken', theRole);
-
+            io.to(roomName).emit('roleTaken', theRole);
+            if(room.scholarPlayer && room.adventurerPlayer)
+            {
+                io.to(roomName).emit('startGame');
+            }
         }
 
-        ////  THIS IS WHERE YOU ASK WHAT THE PLAYER WANTS TO BE SCHOLOR OR ADV
+        player.on('startTimer',setTimer);
+        function setTimer(timerCountdown)
+        {
+            room.timerCountdown = timerCountdown;
+        }
+        function startTimer()
+        {
+            const timer = setInterval(() => {
+                room.timerCountdown -= 1;
+                if(timerCountdown <= 0)
+                {
+                    io.to(roomName).emit('loseGame');
+                    clearInterval(timer);
+                }
+                if(timerCountdown % 5)
+                {
+                    io.to(roomName).emit('syncTimer',room.timerCountdown);
+                }
+            },1000);
+        }
+
+        player.on('incorrectQuestion',incorrectQuestion);
+        player.on('correctQuestion',correctQuestion);
+
+        function incorrectQuestion()
+        {
+            room.timerCountdown -= 20;
+            io.to(roomName).emit('syncTimer',room.timerCountdown);
+            player.incorrectQuestions++;
+        }
+        function correctQuestion(nextTextNodeId)
+        {
+            room.questions++;
+            if(room.questions == 2)
+            {
+                room.timerCountdown += 20;
+                io.to(roomName).emit('syncTimer',room.timerCountdown);
+                room.questions = 0;
+                if(nextTextNodeId != 5) {
+                    io.to(roomName).emit('nextQuestion',nextTextNodeId);
+                }
+                else {
+                    io.to(roomName).emit('startFubar');
+                }
+            }
+        }
 
 
     }
 
     function makeid(length) {
         var result           = '';
-        var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         var charactersLength = characters.length;
         for ( var i = 0; i < length; i++ ) {
            result += characters.charAt(Math.floor(Math.random() * charactersLength));

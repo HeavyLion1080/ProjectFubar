@@ -6,10 +6,6 @@
     <link rel="icon" href="favicon.ico">
 
     <style>
-      #room-container
-      {
-        display: none;
-      }
       #roleSelectScreen
       {
         display: none;
@@ -18,53 +14,50 @@
   </head>
 
   <body>
-    <div id="initialScreen" class="h-100">
-      <div class="d-flex flex-column align-items-center justify-content-center h-100">
-          <h1>Project Fubar</h01>
-          <button
+    <div id="room-container" class="game-container">
+      <div id="initialScreen" class="startScreen">
+        <ul class="start"><center>
+          <li>Project Fubar</li>
+          <li><button
             type="submit"
-            class="btn btn-success"
+            class="btn"
             id="newGameButton"
           >
-            Create New Game
-          </button>
-          <div>OR</div>
-          <div class="form-group">
-            <input type="text" placeholder="Enter Game Code" id="gameCodeInput"/>
-          </div>
-          <button
+          Create Game as Admin
+          </button></li>
+          <li>OR</li>
+          <input type="text" placeholder="Enter Game Code" id="gameCodeInput"/>
+          <li><button
             type="submit"
-            class="btn btn-success"
+            class="btn"
             id="joinGameButton"
           >
-            Join Game
-          </button>
+            Join Game as Player
+          </button></li>
+        </center></ul>
       </div>
-    </div>
-
-    <div id="roleSelectScreen" class="h-100">
-      <div class="d-flex flex-column align-items-center justify-content-center h-100">
-          <h1>Select Your Character</h01>
-          <button
+      <div id="roleSelectScreen" class="startScreen">
+        <ul class="start"><center>
+          <li>Choose Role:</li>
+          <li><button
             type="submit"
             class="btn btn-success"
             id="scholarSelect"
           >
             Scholar
-          </button>
-          <div>OR</div>
-          <button
+          </button></li>
+          <li>OR</li>
+          <li><button
             type="submit"
             class="btn btn-success"
             id="adventurerSelect"
           >
             Adventurer
-          </button>
+          </button></li>
+        </center></ul>
       </div>
-    </div>
-
-    <div id="room-container" class="game-container">
       <div id="timer" class="text"></div>
+      <div id="code" class="text"></div>
       <canvas id="room-canvas" class="game-canvas" width="800px" height="600"></canvas>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.js"></script>

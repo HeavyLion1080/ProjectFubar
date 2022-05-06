@@ -3,9 +3,6 @@ class Result
     constructor(container, fubar)
     {
         this.container = container;
-        this.optionButtonsElement = document.createElement("option-buttons");
-        this.optionButtonsElement.setAttribute("class","btn-grid");
-        this.container.appendChild(this.optionButtonsElement);
     }
 
     displayResults(data)
@@ -23,6 +20,7 @@ class Result
         ]
 
         const ul = document.createElement('ul');
+        ul.setAttribute('class', 'results');
         this.container.appendChild(ul);
         text.forEach(element => {
             let li = document.createElement('li');
