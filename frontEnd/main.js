@@ -25,23 +25,27 @@
   const gameCodeInput = document.getElementById('gameCodeInput');
   const gameCodeDisplay = document.getElementById('gameCodeDisplay');
 
+  let playerNumber;
+
   newGameBtn.addEventListener('click', newGame);
   joinGameBtn.addEventListener('click', joinGame);
  
   function newGame() {
     console.log("new game button was clicked");
-    socket.emit('newGame', data);
-    createQuestions(data); 
+    socket.emit('newGame');
+    showAdminScreen();
   }
   
   function joinGame() {
     const code = gameCodeInput.value;
     socket.emit('joinGame', code);
-    createQuestions(data);
+    showRoleSelectionScreen();
   }
 
   function handleInit(number) {
     playerNumber = number;
+    
+    console.log("server sees " + playerNumber)
   }
   
   function handleGameState(gameState) {
@@ -58,7 +62,7 @@
     }
     data = JSON.parse(data);
   
-    gameActive = false;
+    gameActive = false; 
   
     if (data.winner === playerNumber) {
       alert('You Win!');
@@ -68,7 +72,9 @@
   }
   
   function handleGameCode(gameCode) {
-    gameCodeDisplay.innerText = gameCode;
+
+    console.log("game COde is " + gameCode);
+    //gameCodeDisplay.innerText = gameCode;
   }
   
   function handleUnknownCode() {
@@ -79,6 +85,22 @@
   function handleTooManyPlayers() {
     reset();
     alert('This game is already in progress');
+  }
+
+  function showAdminScreen () {
+    console.log("Admin Screen");
+  }
+
+  function showRoleSelectionScreen(){
+    initialScreen.style.display = "none";
+    roleSelectScreen.style.display = "block";
+  }
+
+  function reset() {
+    playerNumber = null;
+    gameCodeInput.value = '';
+    initialScreen.style.display = "block";
+    roleSelectScreen.style.display = "none";
   }
 /*
 ///////////////////////////////////////////////////////////////////
@@ -94,9 +116,9 @@ gameScreen.style.display = "block";
   var questions;
   var timerCountdown;
   // Grabs the data from the json file and sends it to the question class
-  fetch("./questions.json")
-  .then(function(u){ return u.json();})
-  .then(function(data){createQuestions(data);})
+  //fetch("./questions.json")
+  //.then(function(u){ return u.json();})
+  //.then(function(data){createQuestions(data);})
 
 
 

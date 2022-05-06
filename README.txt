@@ -6,7 +6,7 @@ In here we attempt to create a project over the course of the semester and learn
 of software development. We are a team of 4 of the students in the class, refered to as Team C, 
 which contains the members of John Harrington, Abdulrehman Rashid, Mark Reichert, Jacob Singer.
 
-In here we will connect two players to play the game where during phase 1 of the game we will 
+    In here we will connect two players to play the game where during phase 1 of the game we will 
 have the players answer trivia questions that are dependent on the administrator of the game 
 discretion. When they answer all the questions within the time limit they will move onto phase 2 
 of the game where each player will be placed into different rooms where they will have to work 
@@ -39,7 +39,7 @@ Configuration:
 
 Question Instructions:
 
-When filling out a new questions.json file the "id" is the position the question will be when the questions in phase 1 start. 
+    When filling out a new questions.json file the "id" is the position the question will be when the questions in phase 1 start. 
 Under "id" will be the "text", here is where the question in which the administrator wants to ask. 
 Under the "text" for each question, there will be "options" where there will be 4 entries of options. 
 Within each option there will be a "text" label that will take in answers for the question above. 

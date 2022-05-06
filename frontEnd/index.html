@@ -10,6 +10,10 @@
       {
         display: none;
       }
+      #roleSelectScreen
+      {
+        display: none;
+      }
     </style>
   </head>
 
@@ -37,6 +41,28 @@
           </button>
       </div>
     </div>
+
+    <div id="roleSelectScreen" class="h-100">
+      <div class="d-flex flex-column align-items-center justify-content-center h-100">
+          <h1>Select Your Character</h01>
+          <button
+            type="submit"
+            class="btn btn-success"
+            id="scholarSelect"
+          >
+            Scholar
+          </button>
+          <div>OR</div>
+          <button
+            type="submit"
+            class="btn btn-success"
+            id="adventurerSelect"
+          >
+            Adventurer
+          </button>
+      </div>
+    </div>
+
     <div id="room-container" class="game-container">
       <div id="timer" class="text"></div>
       <canvas id="room-canvas" class="game-canvas" width="800px" height="600"></canvas>
