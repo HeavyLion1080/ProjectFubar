@@ -1,9 +1,10 @@
 (function () 
 {
   const room = document.getElementById("room-container");
-  const name = 'scholar';
   const socket = io('http://localhost:4000');
   const fubar = new Fubar(name, socket);
+
+  var name;
 
   // Create timer element in the top right of the game
   const timerDisplay = document.getElementById('timer');
@@ -18,6 +19,8 @@
   socket.on('unknownCode', handleUnknownCode);        //sends error message
   socket.on('tooManyPlayers', handleTooManyPlayers);  //send message if a player tries to enter a full room
 
+  socket.on('roleTaken', disableButton);
+
   const gameScreen = document.getElementById('gameScreen');
   const initialScreen = document.getElementById('initialScreen');
   const newGameBtn = document.getElementById('newGameButton');
@@ -29,6 +32,35 @@
 
   newGameBtn.addEventListener('click', newGame);
   joinGameBtn.addEventListener('click', joinGame);
+
+  scholarSelect.addEventListener('click', makeScholar);
+  adventurerSelect.addEventListener('click', makeAdventurer);
+
+  function makeScholar(){
+    console.log("mfs wanna be scholars n shit");
+
+    socket.emit('roleSelect', "scholar");
+    name = "scholar";
+  }
+
+  function makeAdventurer(){
+    console.log("mfs wanna die outside");
+
+    socket.emit('roleSelect', "adventurer");
+    name = "adventurer";
+  }
+  
+  function disableButton (aRole){
+    console.log("p[ast my b time to g");
+    
+    if(aRole == "adventurer"){
+      adventurerSelect.removeEventListener('click', makeAdventurer);
+      adventurerSelect.style.background = "grey";
+    } else if(aRole == "scholar"){
+      scholarSelect.removeEventListener('click', makeScholar);
+      scholarSelect.style.background = "grey";
+    }
+  }
  
   function newGame() {
     console.log("new game button was clicked");
@@ -38,16 +70,22 @@
   
   function joinGame() {
     const code = gameCodeInput.value;
+
+    console.log("server sees code " + code)
+    
     socket.emit('joinGame', code);
-    showRoleSelectionScreen();
   }
 
   function handleInit(number) {
     playerNumber = number;
     
     console.log("server sees " + playerNumber)
+    
+    if(playerNumber > 1)
+    {
+      showRoleSelectionScreen();
+    }
   }
-  
   function handleGameState(gameState) {
     if (!gameActive) {
       return;

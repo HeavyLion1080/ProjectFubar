@@ -19,6 +19,7 @@ io.on('connection', (player) => {
     player.on('newGame', handleNewGame);
     player.on('joinGame', handleJoinGame);
 
+
     function handleNewGame() {
         let roomName = makeid(5);
         console.log(roomName);
@@ -41,27 +42,25 @@ io.on('connection', (player) => {
     
         console.log("step 4")
     }
-
-    function handleJoinGame(roomName) {
-        const room = io.sockets.adapter.rooms[roomName];
     
-        let allUsers;    
+    function handleJoinGame(roomName) {
+        const room = io.sockets.adapter.rooms.get(roomName);
+    
+        
+        console.log("server sees room " + room + "and the name " + roomName)
+
         let numPlayers = 0;
 
         if (room) {
-            allUsers = room.sockets;
-        }
-
-        if (allUsers) {
             console.log("Got the number of players")
-            numPlayers = Object.keys(allUsers).length;
+            numPlayers = room.size;
         }
     
-        if (numPlayers == 0) {
+        if (numPlayers === 0) {
             console.log("number of player is " + numPlayers)
             player.emit('unknownCode');
             return;
-        } else if (numPlayers == 1 ) {
+        } else if (numPlayers === 1 ) {
             console.log("number of player is " + numPlayers)
             playerRooms[player.id] = roomName;
     
@@ -70,8 +69,8 @@ io.on('connection', (player) => {
             player.emit('init', 2);
         
             //startGameInterval(roomName);
-            return;
-        } else if (numPlayers == 2) {
+            
+        } else if (numPlayers === 2) {
             console.log("number of player is " + numPlayers)
             playerRooms[player.id] = roomName;
     
@@ -80,24 +79,38 @@ io.on('connection', (player) => {
             player.emit('init', 3);
         
             //startGameInterval(roomName);
-            return;
+            
         } else if (numPlayers > 2) {
             console.log("number of player is " + numPlayers)
             player.emit('tooManyPlayers');
             return;
         } 
 
-        player.on("roleSelect");
+        room.scholarPlayer;
+        room.adventurerPlayer;
     
+
+        player.on('roleSelect', checkRole);
+    
+
+        function checkRole (theRole){
+            console.log("im workin here");
+
+            if(theRole == "scholar"){
+                room.scholarPlayer = player.number;
+            } else if (theRole == "adventurer"){
+                room.adventurerPlayer = player.number;
+            }
+
+            console.log("the role be " + theRole);
+
+            player.emit('roleTaken', theRole);
+
+        }
+
         ////  THIS IS WHERE YOU ASK WHAT THE PLAYER WANTS TO BE SCHOLOR OR ADV
 
-        playerRooms[player.id] = roomName;
-    
-        player.join(roomName);
-        player.number = 2;
-        player.emit('init', 2);
-        
-        startGameInterval(roomName);
+
     }
 
     function makeid(length) {
