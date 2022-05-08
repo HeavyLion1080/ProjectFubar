@@ -1,54 +1,66 @@
 Introduction:
-------------
+------------------
+OperationFubar is a multiplayer virtual escape game that is played on a web browser.
+This was developed as a class project from the SUNY Oswego CSC380 class of Spring 2022.
+This project was developed by John Harrington, Abdulrehman Rashid, Mark Reichert, and Jacob Singer.
 
-    Welcome to The Virtual Escape Room project from SUNY Oswego's CSC 380 course in Spring 2022. 
-In here we attempt to create a project over the course of the semester and learning the process 
-of software development. We are a team of 4 of the students in the class, refered to as Team C, 
-which contains the members of John Harrington, Abdulrehman Rashid, Mark Reichert, Jacob Singer.
 
-    In here we will connect two players to play the game where during phase 1 of the game we will 
-have the players answer trivia questions that are dependent on the administrator of the game 
-discretion. When they answer all the questions within the time limit they will move onto phase 2 
-of the game where each player will be placed into different rooms where they will have to work 
-together in order to complete the game. At the end of the game after all the task have been 
-completed we will show a result screen on how the players did. If they fail to complete the game
-within the time limit they will be shown the results screen where they have run out of time and 
-the metrics they had in the game to that point.
+Description:
+------------------
+OperationFubar requires three players to be played, an admin and two players.
+The admin has to create a room which will generate a code that the other players can enter
+to join the room. The two players then have to select a role, either the adventure and scholar. 
+After the roles are selected the question phase starts. During the question phase players will 
+recieve a question and four answers. The admin can edit a CSV file to change the questions.
+If an incorrect answer is selected time will be deducted and it will be recorded to be displayed 
+to the admin when the game ends. After all of the questions are answered the puzzle phase starts. 
+Now the players can interact with items to solve puzzles. If the final puzzles are solved then the 
+game ends in victory, if time runs out then the game will end in a loss. The metrics will be displayed 
+after the game ends, the admin can see the players clicks, wrong answers, and the time remaining if it 
+did not run out. The players will only see the time remaining.
+
 
 Requirements:
-------------
+------------------
+Nodejs is required and can be installed at https://nodejs.org/
 
-This program will require the following:
-
-    Node.js 
-    A text editor such as Notepad.
 
 Installation:
--------------
+------------------
+There are two methods to download the game.
+(1) If git is installed the command "git clone https://github.com/HeavyLion1080/ProjectFubar.git"
+    can be ran from the directory you want the game in.
 
-Install Node.js for which operating system that you will be running here:
-https://nodejs.org/en/download/
-
-For instructions on how to set up Node.js visit:
-https://phoenixnap.com/kb/install-node-js-npm-on-windows
+(2) Or from https://github.com/HeavyLion1080/ProjectFubar click the green "Code" button and download
+    the zip, then unzip the file in the directory you want the game in.
 
 
+Game Customization:
+------------------
+A file included in with the game is called "questions.json" this file can be customized to change the game
+time and the questions. The first section contains 1 value "time", the number is time in seconds and can 
+be customized. After that it is broken into 2 sections, adventurer and scholar which separates the questions
+each role. Each question contains an "id" field which contains the question id, it starts at 1 and increments
+by 1 each question. Under that is a "text" field which contains the question text which can be customized.
+Next there is the "options" field, which holds the answers to the questions. "text" is the text for each 
+answer. The "nextText" is a number, if the answer is the wrong answer then nextText will be the same as the
+question id, if the answer is the correct answer then nextText will be the next questions id.
 
-Configuration:
--------------
 
-Question Instructions:
+Set Up:
+------------------
+Included in the folder is a file called start.bat, this file can be ran to start the server.
+If Nodejs is not installed the file will not run. The first time the file is ran it will install
+all of the required node packages. If any y/n prompts appear enter y. When the server is running ctrl+c
+the prompt "Terminate batch job (Y/N)?" will appear, DO NOT enter y here, it will stop the script file
+early and will not shut off the server properly. Instead either enter n, or press ctrl+c again. If y is entered,
+the server can be stopped by running the script again and stopping it properly. To connect to the game you can 
+enter the address that is displayed near the top of the terminal, the line will look like this: 
+"To connect to the game enter: http://0.0.0.0:8080/ into a web browser", just with a different address.
 
-    When filling out a new questions.json file the "id" is the position the question will be when the questions in phase 1 start. 
-Under "id" will be the "text", here is where the question in which the administrator wants to ask. 
-Under the "text" for each question, there will be "options" where there will be 4 entries of options. 
-Within each option there will be a "text" label that will take in answers for the question above. 
-The "nexttext" numerical value will indicate a wrong answer if it is equal to the questions current "id" number,
-and a correct answer if its is the questions current "id" numerical value incremented by 1.
 
-Copyright and licensing information:
+Image credits:
 -----------------------------------
-
 Playing-Cards: OpenClipart-Vectors, July 2013, Free for Commercial Use, 
 available at: https://pixabay.com/vectors/card-deck-deck-cards-playing-cards-161536/ March 2022.
 
