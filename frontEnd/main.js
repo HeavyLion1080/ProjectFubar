@@ -186,7 +186,7 @@
   {
     if(has_focus)
     {
-      if(!alert("test")) {
+      if(!alert("A player has disconnected!")) {
         location.reload();
       }
     }
