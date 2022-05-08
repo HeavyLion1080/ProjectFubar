@@ -1,7 +1,9 @@
 (function () 
 {
   const room = document.getElementById("room-container");
-  const socket = io('http://localhost:4000');
+  const socket = io('http://localhost:3000', {
+    transports: ["websocket"]
+  });
 
   var name;
 
@@ -250,7 +252,5 @@ gameScreen.style.display = "block";
     document.addEventListener("subtractTime", () => timerCountdown = timerCountdown - 20);
     document.addEventListener("addTime", () => timerCountdown = timerCountdown + 20);
   });
-  
- //   const res = new Result(room1,fubar);
-   //  res.displayResults([5,10,23,69,420]);
+
 })();

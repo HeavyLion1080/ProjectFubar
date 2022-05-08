@@ -7,9 +7,7 @@ const io = require("socket.io")(httpServer, {
     }
 });
 
-const state = {};
 const playerRooms = {};
-
 
 io.on('connection', (player) => {
     console.log('a user has connected ' + player.id );
@@ -30,8 +28,6 @@ io.on('connection', (player) => {
         
         console.log("step 1")
 
-        //state[roomName] = initGame();   //sets the room state to initial game state 
-    
         player.join(roomName);          // .join is a socket command to join a room
         
         console.log("step 2")
@@ -254,6 +250,4 @@ io.on('connection', (player) => {
 });
 
 
-httpServer.listen(4000, () => {
-    console.log('listening on *:4000');
-});
+httpServer.listen(3000);
