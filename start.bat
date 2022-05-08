@@ -5,7 +5,8 @@ setlocal EnableDelayedExpansion
 for /f "delims=" %%i in ('node -v 2^>nul') do set output=%%i
 
 if "!output!" EQU "" (
-    echo node is not installed
+    echo ERROR: Nodejs is not installed!
+    pause
 ) else (
     if NOT exist ./server/node_modules (
         echo installing server node packages
