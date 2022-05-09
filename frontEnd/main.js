@@ -6,33 +6,34 @@
   });
 
   var name;
-
   var has_focus = true;
   window.onfocus = () => has_focus = true;
   window.onblur = () => has_focus = false;
+
   // Create timer element in the top right of the game
   const timerDisplay = document.getElementById('timer');
   timerDisplay.style.top = '10px';
   timerDisplay.style.right = '10px';
 
+  // Create element in the top left to show game code
   const codeDisplay = document.getElementById('code');
   codeDisplay.style.top = '10px';
   codeDisplay.style.left = '10px';
 
-  //start sceen stoof  
-  socket.on('init', handleInit);                      //sets player number 
-  socket.on('gameCode', handleGameCode);              //Displays gamecode
-  socket.on('unknownCode', handleUnknownCode);        //sends error message
-  socket.on('tooManyPlayers', handleTooManyPlayers);  //send message if a player tries to enter a full room
-  socket.on('startGame',startGame);
-  socket.on('syncTimer',syncTimer);
+  // Functions the client listens to from the server
+  socket.on('init', handleInit);               
+  socket.on('gameCode', handleGameCode);             
+  socket.on('unknownCode', handleUnknownCode);        
+  socket.on('tooManyPlayers', handleTooManyPlayers);  
+  socket.on('startGame',startGame);                   
+  socket.on('syncTimer',syncTimer);                   
   socket.on('startFubar',startFubar);
   socket.on('loseGame',showLoseScreen);
   socket.on('winGame',showWinScreen);
   socket.on('playerLeft',playerLeft);
-
   socket.on('roleTaken', disableButton);
 
+  // Grab html elements to be used
   const initialScreen = document.getElementById('initialScreen');
   const newGameBtn = document.getElementById('newGameButton');
   const joinGameBtn = document.getElementById('joinGameButton');
@@ -47,8 +48,8 @@
   scholarSelect.addEventListener('click', makeScholar);
   adventurerSelect.addEventListener('click', makeAdventurer);
 
+  // If scholar button was pressed disable the adventurer button and emit message that scholar was pressed
   function makeScholar(){
-    console.log("mfs wanna be scholars n shit");
 
     adventurerSelect.removeEventListener('click', makeAdventurer);
     adventurerSelect.style.background = "grey";
@@ -57,8 +58,8 @@
     name = "scholar";
   }
 
+  // If adventurer button was pressed disable the scholar button and emit message that adventurer was pressed
   function makeAdventurer(){
-    console.log("mfs wanna die outside");
 
     scholarSelect.removeEventListener('click', makeScholar);
     scholarSelect.style.background = "grey";
@@ -67,8 +68,8 @@
     name = "adventurer";
   }
   
+  // Disable the button that was pressed
   function disableButton (aRole){
-    console.log("p[ast my b time to g");
     
     if(aRole == "adventurer"){
       adventurerSelect.removeEventListener('click', makeAdventurer);
@@ -79,60 +80,59 @@
     }
   }
  
+  // Tell the server that a game was created and show the admin screen
   function newGame() {
-    console.log("new game button was clicked");
     socket.emit('newGame');
     showAdminScreen();
   }
   
+  // Attempt to join game with the entered code
   function joinGame() {
-    const code = gameCodeInput.value;
-
-    console.log("server sees code " + code)
-    
+    const code = gameCodeInput.value;    
     socket.emit('joinGame', code);
   }
 
+  // If the player joined the game and is not the admin show the role select screen
   function handleInit(number) {
     playerNumber = number;
-    
-    console.log("server sees " + playerNumber)
-    
     if(playerNumber > 1)
     {
       showRoleSelectionScreen();
     }
   }
 
+  // Display the game code in the top left
   function handleGameCode(gameCode) {
 
-    console.log("game COde is " + gameCode);
     codeDisplay.innerText = "Game Code: " + gameCode;
   }
   
+  // If the entered code did not belong to a game send alert
   function handleUnknownCode() {
     alert('Unknown Game Code')
   }
   
+  // If the game already has 3 players send alert
   function handleTooManyPlayers() {
     alert('This game is already in progress');
   }
 
+  // Remove the buttons and show code and timer for the admin
   function showAdminScreen () {
-    console.log("Admin Screen");
 
     const initialScreen = document.getElementById('initialScreen');
     const roleScreen = document.getElementById('roleSelectScreen');
     initialScreen.remove();
     initialScreen.remove();
-    
   }
 
+  // Remove the start buttons and show role select buttons
   function showRoleSelectionScreen(){
     initialScreen.remove();
     roleSelectScreen.style.display = "flex";
   }
 
+  // Once both players joined the game remove the role select buttons and start the question phase
   function startGame() {
     roleSelectScreen.remove();
     fetch("./questions.json")
@@ -140,11 +140,13 @@
     .then(function(data){createQuestions(data);})
   }
 
+  // Sync in game timer with server timer
   function syncTimer(time)
   {
     timerCountdown = time;
   }
 
+  // When the questions are done show the second phase for the players
   function startFubar()
   {
     if(playerNumber != 1)
@@ -156,6 +158,7 @@
     }
   }
 
+  // If the final puzzles are solved show the win results
   function showWinScreen(metrics)
   {
     clearInterval(room.timer);
@@ -166,9 +169,9 @@
     else
       resultScreen.playerWin(metrics);
   }
+  // If the time runs out show the loss results
   function showLoseScreen(metrics)
   {
-    console.log('L');
     clearInterval(room.timer);
     removeAllCHildNodes(room);
     const resultScreen = new Result(room);
@@ -177,6 +180,8 @@
     else
       resultScreen.playerLoss(metrics);
   }
+
+  // Removes all elements from game other than game code
   function removeAllCHildNodes(parent)
   {
     while(parent.children[1])
@@ -184,6 +189,8 @@
       parent.removeChild(parent.children[1]);
     }
   }
+
+  // If a player left the game send an alert and reload the page when the alert is closed
   function playerLeft()
   {
     if(has_focus)
@@ -197,30 +204,13 @@
       setTimeout(() => playerLeft(),250);
     }
   }
-    
-/*
-///////////////////////////////////////////////////////////////////
-
-  THE FOLLOWING CODE NEEDS TO BE ADDED TO GET RID OF THE HOME SCREEN 
-    AND SHOW THE GAME SCREEN 
-initialScreen.style.display = "none";      
-gameScreen.style.display = "block";
-
-////////////////////////////////////////////////////////////////////
-*/
-
+  
+  // Create the questions from the json file and start the timer
   var questions;
   var timerCountdown;
-  // Grabs the data from the json file and sends it to the question class
-  //fetch("./questions.json")
-  //.then(function(u){ return u.json();})
-  //.then(function(data){createQuestions(data);})
-
-
   function createQuestions(data)
   {
     timerCountdown = data[0].time;
-    console.log(timerCountdown);
     if(name == 'adventurer')
     {
       questions = new Questions(room, data[1].questions, socket);
