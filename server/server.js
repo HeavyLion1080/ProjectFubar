@@ -59,6 +59,7 @@ io.on('connection', (player) => {
             // Initialize variables to the room
             room.scholarPlayer = 0;
             room.adventurerPlayer = 0;
+            room.questions = 0;
             room.metrics = {};
             room.metrics['scholarIncorrect'] = 0;
             room.metrics['adventurerIncorrect'] = 0;
